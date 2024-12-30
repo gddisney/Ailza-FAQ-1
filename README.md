@@ -27,7 +27,7 @@ This project is a web-based FAQ system that combines Bert embeddings and emotion
 - **Data Files**:
   - `faq.jsonl`: Contains the FAQ dataset.
   - `emotions.json`: Contains emotion mappings.
-  - `glove.840B.300d.txt`: Pre-trained GloVe embeddings. Download from [GloVe's official website](https://nlp.stanford.edu/projects/glove/).
+  - `word2vex.txt`: Pre-trained GloVe embeddings used through Word2Vec with S2S. Download from [GloVe's official website](https://nlp.stanford.edu/projects/glove/).
 
 ---
 
