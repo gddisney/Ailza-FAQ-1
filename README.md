@@ -39,7 +39,7 @@ This project is a web-based FAQ system that combines Bert embeddings and emotion
    ```
 
 2. **Prepare Data Files**:
-   - Place `faq.jsonl`, `emotions.json`, and `glove.840B.300d.txt` in the `data/` directory.
+   - Place `faq.jsonl`, `emotions.json`, and `word2vec.txt` in the `data/` directory.
 
 3. **Run the Application**:
    ```bash
