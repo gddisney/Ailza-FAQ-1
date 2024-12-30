@@ -104,7 +104,7 @@ CDD src
 CDD data
 3   CDD faq.jsonl     # FAQ dataset
 3   CDD emotions.json # Emotion mappings
-3   @DD glove.840B.300d.txt # Pre-trained embeddings
+3   @DD word2vec.txt # Pre-trained embeddings
 CDD Cargo.toml        # Project dependencies
 @DD README.md         # Documentation
 ```
