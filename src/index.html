@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Conversational Bot</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 flex items-center justify-center h-screen">
+    <div class="w-full max-w-lg mx-auto bg-white rounded-2xl shadow-xl flex flex-col h-[90vh]">
+        <div class="bg-blue-600 text-white p-4 rounded-t-2xl shadow-md">
+            <h1 class="text-xl font-bold text-center">Chat with a Bot</h1>
+        </div>
+        
+        <div id="chat-log" class="flex-1 p-6 space-y-4 overflow-y-auto">
+            <div class="flex items-start gap-3">
+                <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-lg">B</div>
+                <div class="bg-blue-50 p-3 rounded-lg rounded-tl-none max-w-xs md:max-w-md">
+                    <p class="text-sm text-gray-800">Hi there! What's on your mind?</p>
+                </div>
+            </div>
+        </div>
+        
+        <div class="p-4 bg-gray-50 border-t border-gray-200 rounded-b-2xl">
+            <div class="flex items-center space-x-3">
+                <input type="text" id="user-input" placeholder="Type your message..." class="flex-1 w-full px-4 py-2 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-200">
+                <button id="send-btn" class="bg-blue-600 text-white rounded-full p-3 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition duration-200">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const chatLog = document.getElementById('chat-log');
+        const userInput = document.getElementById('user-input');
+        const sendBtn = document.getElementById('send-btn');
+
+        // This function sends the user's message to the Rust backend and gets the response.
+        async function getBotResponse(userText) {
+            try {
+                const response = await fetch('/ask', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ user_input: userText }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.response;
+            } catch (error) {
+                console.error("Error fetching bot response:", error);
+                return "Sorry, I'm having trouble connecting to my brain right now. Please try again later.";
+            }
+        }
+
+        function addMessage(text, sender) {
+            const isUser = sender === 'user';
+            
+            let messageHtml = '';
+            if (isUser) {
+                // User message (right-aligned)
+                messageHtml = `
+                    <div class="flex justify-end">
+                        <div class="bg-gray-200 p-3 rounded-lg rounded-br-none max-w-xs md:max-w-md">
+                            <p class="text-sm text-gray-800">${text}</p>
+                        </div>
+                    </div>`;
+            } else {
+                // Bot message (left-aligned)
+                messageHtml = `
+                    <div class="flex items-start gap-3">
+                        <div class="flex-shrink-0 w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center text-white font-bold text-lg">B</div>
+                        <div class="bg-blue-50 p-3 rounded-lg rounded-tl-none max-w-xs md:max-w-md">
+                            <p class="text-sm text-gray-800">${text}</p>
+                        </div>
+                    </div>`;
+            }
+            
+            chatLog.innerHTML += messageHtml;
+            // Scroll to the bottom of the chat log
+            chatLog.scrollTop = chatLog.scrollHeight;
+        }
+
+        async function handleSend() {
+            const userText = userInput.value.trim();
+            if (userText === "") return;
+
+            addMessage(userText, 'user');
+            userInput.value = "";
+            userInput.disabled = true;
+            sendBtn.disabled = true;
+
+            // Get response from the backend
+            const botResponse = await getBotResponse(userText);
+            addMessage(botResponse, 'bot');
+            
+            userInput.disabled = false;
+            sendBtn.disabled = false;
+            userInput.focus();
+        }
+
+        sendBtn.addEventListener('click', handleSend);
+        userInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                handleSend();
+            }
+        });
+
+    </script>
+</body>
+</html>
